@@ -15,17 +15,19 @@ x_axis_config = {
 
 y_axis_config = {
     'num_font': {'name': 'Calibri', 'size': 12},
-    'min': -1.1,
-    'max': 1.9,
+    'min': -1.0,
+    'max': 2.0,
     'major_unit': 0.5,
-    'major_gridlines': {'visible': False}
+    'major_gridlines': {'visible': False},
+    'crossing': 0
 }
 
 y2_axis_config = {
     'num_font': {'name': 'Calibri', 'size': 12},
-    'min': -4.0,
-    'max': 14.0,
-    'major_unit': 2.0,
+    'min': -7.5,
+    'max': 15.0,
+    'major_unit': 1.5,
+    'crossing': 0
 }
 
 legend_config = {
