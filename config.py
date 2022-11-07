@@ -10,7 +10,7 @@ x_axis_config = {
     'num_format': 'mmm-yy',
     'label_position': 'low',
     'major_unit': 1,
-    'major_unit_type': 'years'
+    'major_unit_type': 'months'
 }
 
 y_axis_config = {
@@ -23,9 +23,9 @@ y_axis_config = {
 
 y2_axis_config = {
     'num_font': {'name': 'Calibri', 'size': 12},
-    'min': -4,
-    'max': 14,
-    'major_unit': 2,
+    'min': -4.0,
+    'max': 14.0,
+    'major_unit': 2.0,
 }
 
 legend_config = {

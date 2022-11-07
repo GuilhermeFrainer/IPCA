@@ -25,13 +25,14 @@ def main():
 
     ipca_data = join_lists(ipca_data, expectations)
 
-    headers = ["Mês", "Índice", "T/T-1", "Acumulado 12 meses"]
+    headers = ["Mês", "Índice", "T/T-1", "Acumulado 12 meses", "Expectativas"]
     workbook, worksheet = sidra_helpers.make_excel("IPCA", ipca_data, headers)
     workbook, worksheet = calculate_yoy(workbook, worksheet)
 
     make_chart(workbook)
     credits = [
-        'Arquivo feito em Python',
+        'Arquivo feito em Python. Link do código:',
+        'https://github.com/GuilhermeFrainer/IPCA',
         'Fontes dos dados:',
         'API do SIDRA',
         'API do Banco Central do Brasil'
@@ -49,7 +50,7 @@ def calculate_yoy(workbook: Workbook, worksheet: Workbook.worksheet_class) -> tu
     # Calculates the changes to inflation based on expectations
     for i in range(ipca_size + 2, series_size + 2):
         # Writes changes to the index
-        worksheet.write_formula(f'$B{i}', f'=$B{i - 1}*(1+$C{i}/100)', sidra_helpers.number_format)
+        worksheet.write_formula(f'$B{i}', f'=$B{i - 1}*(1+$E{i}/100)', sidra_helpers.number_format)
 
         # Writes changes to inflation
         worksheet.write_formula(f'$D{i}', f'=($B{i}/$B{i - 12}-1)*100', sidra_helpers.number_format)
@@ -61,8 +62,16 @@ def calculate_yoy(workbook: Workbook, worksheet: Workbook.worksheet_class) -> tu
 def join_lists(ipca_data: list[list], expectations_data: list[list]) -> list[list]:
 
     ipca_data[0].extend(expectations_data[0])
-    ipca_data[2].extend(expectations_data[1])
     
+    # Adds zeros to all the months with actual values
+    expectations_data[1] = expectations_data[1][::-1]
+    
+    for i in range(ipca_size):
+        expectations_data[1].append(None)
+
+    expectations_data[1] = expectations_data[1][::-1]
+    ipca_data.append(expectations_data[1])
+
     return ipca_data
 
 
@@ -128,7 +137,7 @@ def get_ipca_data(period : str) -> list[list]:
 def find_chart_start() -> int:
     series_start = config.SERIES_START_DATE.split("-")
     chart_start = config.CHART_START_DATE.split("-")
-    difference = (int(chart_start[0]) - int(series_start[0])) + (int(chart_start[1]) - int(series_start[1]))
+    difference = (int(chart_start[0]) - int(series_start[0])) * 12 + (int(chart_start[1]) - int(series_start[1]))
     return difference
 
 
@@ -148,18 +157,20 @@ def make_chart(workbook: Workbook) -> None:
         'name': 'T/T-1',
         'line': {'color': '#4F81BD'},
         'data_labels': {
-            'num_format': '#.#',
+            'num_format': '0.0',
+            'value': True
         }
     })
 
     # Adds series with expectations data
     column_chart.add_series({
         'categories': f'=Dados!$A${chart_start + 2}:$A${series_size + 1}',
-        'values': f'=Dados!$C${ipca_size + 2}:$C${expectations_size + 1}',
+        'values': f'=Dados!$E${chart_start + 2}:$E${series_size + 1}',
         'name': 'Expectativas',
-        'line': {'color': '#9BBB59'},
+        'fill': {'color': '#9BBB59'},
         'data_labels': {
-            'num_format': '#.#',
+            'num_format': '0.0',
+            'value': True
         }
     })
 
@@ -172,8 +183,11 @@ def make_chart(workbook: Workbook) -> None:
         'line': {'color': '#C0504D'},
         'y2_axis': True,
         'data_labels': {
-            'num_format': '#.#',
-            'font': {'color': '#C0504D'}
+            'num_format': '0.0',
+            'font': {
+                'color': '#C0504D',
+                'size': 12     
+            }
         }
     })
 
