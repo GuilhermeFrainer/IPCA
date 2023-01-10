@@ -26,7 +26,7 @@ def main():
     ipca_data = join_lists(ipca_data, expectations)
 
     headers = ["Mês", "Índice", "T/T-1", "Acumulado 12 meses", "Expectativas"]
-    workbook, worksheet = sidra_helpers.make_excel("IPCA", ipca_data, headers)
+    workbook, worksheet = sidra_helpers.make_excel(f"{config.FILE_PATH}IPCA", ipca_data, headers)
     workbook, worksheet = calculate_yoy(workbook, worksheet)
 
     make_chart(workbook)
